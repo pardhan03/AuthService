@@ -2,7 +2,7 @@ const express = require('express');
 const bodyparser = require('body-parser');
 
 const { PORT } = require('./config/serverConfig');
-console.log(PORT)
+console.log('process.env.PORT:', process.env.PORT);
 const setupAndStartServer = async () => {
     const app = express();
 
