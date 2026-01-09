@@ -37,7 +37,24 @@ class UserService {
             console.log('Something went wrong in user repo while singin:', error);
             throw { error };
         }
-    }
+    };
+
+    async isAuthenticated(token){
+        try {
+            const response = this.verifyToken(token);
+            if(!response) {
+                throw { error: 'Invalide token' };
+            };
+            const user = this.UserRepository.getById(response.id);
+            if(!user) {
+                throw { error: 'No user with this corresponding token' };
+            };
+            return user.id;
+        } catch (error) {
+            console.log('Something went wrong at service layer in token authentication:', error);
+            throw { error };
+        };
+    };
 
     createToken(user) {
         try {
@@ -66,7 +83,7 @@ class UserService {
             console.log('Something went wrong at service layer in password comparison:', error);
             throw { error };
         };
-    }
+    };
 };
 
 module.exports = UserService;
