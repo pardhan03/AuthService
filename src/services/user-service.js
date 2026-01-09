@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
 const { UserRepository } = require('../repository/index');
 const { JWT_KEY } =require('../config/serverConfig');
@@ -37,6 +38,15 @@ class UserService {
             throw { error };
         }
     };
+
+    checkPassword(userInputPlainPassword, encryptedPassword) {
+        try {
+            return bcrypt.compareSync(userInputPlainPassword, encryptedPassword);
+        } catch (error) {
+            console.log('Something went wrong at service layer in password comparison:', error);
+            throw { error };
+        };
+    }
 };
 
 module.exports = UserService;
