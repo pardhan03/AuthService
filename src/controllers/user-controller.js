@@ -25,6 +25,28 @@ const create = async (req, res) => {
     };
 };
 
+const signIn = async (req, res) => {
+    console.log('req for signin a user', req.body);
+    try {
+        const response = await userService.signIn(req.body.email, req.body.password);
+        return res.status(SuccessCodes.CREATED).json({
+            message: 'Successfully signed In',
+            data: response,
+            success: true,
+            err: {},
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(ServerErrorCodes.INTERNAL_SERVER_ERROR).json({
+            message: 'Something went wrong',
+            data: {},
+            success: false,
+            err: error,
+        });
+    };
+};
+
 module.exports = {
     create,
+    signIn,
 }
