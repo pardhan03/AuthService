@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
 const { UserRepository } = require('../repository/index');
-const { JWT_KEY } =require('../config/serverConfig');
+const { JWT_KEY } = require('../config/serverConfig');
 const AppError = require('../utils/error-handler');
 
 class UserService {
@@ -15,17 +15,11 @@ class UserService {
             const user = await this.UserRepository.create(data);
             return user;
         } catch (error) {
-            if(error.name == 'SequelizeValidationError') {
+            if (error.name == 'SequelizeValidationError') {
                 throw error;
             }
             console.log('Something went wrong in user repo while create:', error);
-            // throw { error };
-            throw new AppError(
-                'ServerError',
-                'Something went wrong in service',
-                'Logical issue found',
-                500,
-            )
+            throw { error };
         };
     };
 
@@ -33,9 +27,9 @@ class UserService {
         try {
             const user = await this.UserRepository.getByEmail(email);
             const passwordMatch = this.checkPassword(plainPassword, user.password);
-            if(!passwordMatch) {
+            if (!passwordMatch) {
                 console.log('Password doesnt match');
-                throw { error: 'Incorrect Password'};
+                throw { error: 'Incorrect Password' };
             };
 
             const newJwt = this.createToken({
@@ -44,19 +38,22 @@ class UserService {
             })
             return newJwt;
         } catch (error) {
+            if (error.name == 'AttributeNotFound') {
+                throw error;
+            }
             console.log('Something went wrong in user repo while singin:', error);
             throw { error };
         }
     };
 
-    async isAuthenticated(token){
+    async isAuthenticated(token) {
         try {
             const response = this.verifyToken(token);
-            if(!response) {
+            if (!response) {
                 throw { error: 'Invalide token' };
             };
             const user = this.UserRepository.getById(response.id);
-            if(!user) {
+            if (!user) {
                 throw { error: 'No user with this corresponding token' };
             };
             return user.id;
@@ -68,7 +65,7 @@ class UserService {
 
     createToken(user) {
         try {
-            const result = jwt.sign(user, JWT_KEY, { expiresIn: '1h'});
+            const result = jwt.sign(user, JWT_KEY, { expiresIn: '1h' });
             return result;
         } catch (error) {
             console.log('Something went wrong at service layer in token creation:', error);
